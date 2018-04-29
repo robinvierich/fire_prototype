@@ -28,10 +28,42 @@ public class TileGrid : MonoBehaviour {
         return tiles[getTileIndex(x, y)];
     }
 
-
-    private Vector3 gridToWorldPosition(int x, int y)
+    public Vector3 gridToWorldPosition(Vector2Int gridPos)
     {
-        return new Vector3((tileBounds.size.x + padding) * x, (tileBounds.size.y + padding) * y, 0);
+        return new Vector3((tileBounds.size.x + padding) * gridPos.x, (tileBounds.size.y + padding) * gridPos.y, 0);
+    }
+
+    public bool isAdjacent(Vector2Int gridPos1, Vector2Int gridPos2)
+    {
+        return Vector2Int.Distance(gridPos1, gridPos2) == 1;
+    }
+
+    public GameObject[] getAdjacentTiles(Vector2Int gridPos)
+    {
+        GameObject[] tiles = { null, null, null, null };
+        int currIdx = 0;
+
+        if (gridPos.x > 0)
+        {
+            tiles[currIdx++] = getTile(gridPos.x - 1, gridPos.y);
+        }
+
+        if (gridPos.x < width - 1)
+        {
+            tiles[currIdx++] = getTile(gridPos.x + 1, gridPos.y);
+        }
+
+        if (gridPos.y > 0)
+        {
+            tiles[currIdx++] = getTile(gridPos.y - 1, gridPos.y);
+        }
+
+        if (gridPos.x < width - 1)
+        {
+            tiles[currIdx++] = getTile(gridPos.y + 1, gridPos.y);
+        }
+
+        return tiles;
     }
 
     public Tile getTileFromQuad(GameObject quad)
@@ -54,9 +86,11 @@ public class TileGrid : MonoBehaviour {
         {
             for (int y = 0; y < height; ++y)
             {
-                Vector3 pos = gridToWorldPosition(x, y);
+                Vector2Int gridPos = new Vector2Int(x, y);
+                Vector3 pos = gridToWorldPosition(gridPos);
                 GameObject tile =  Instantiate(tilePrefab, pos, Quaternion.identity, this.transform);
                 Tile tileScript = tile.GetComponent<Tile>();
+                tileScript.gridPos = gridPos;
                 tiles[getTileIndex(x, y)] = tile;
                 quadToTileCache[tileScript.quad] = tileScript;
             }

@@ -12,8 +12,10 @@ public class BurnStateOptions
 
 public class Tile : MonoBehaviour
 {
+    public int fuelTurns = 2;
     public BurnState burnState = BurnState.UNBURNT;
     public GameObject quad = null;
+    public Vector2Int gridPos = new Vector2Int(0,0);
     public BurnStateOptions[] burnStateOptions = new BurnStateOptions[(int)BurnState.Count]
     {
         new BurnStateOptions { burnState = BurnState.UNBURNT, tileTexture = null },
@@ -31,6 +33,11 @@ public class Tile : MonoBehaviour
     public bool CanBurn()
     {
         return burnState == BurnState.UNBURNT;
+    }
+
+    public bool isOnFire()
+    {
+        return burnState == BurnState.ON_FIRE;
     }
 
     public void StartBurn()

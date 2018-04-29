@@ -7,15 +7,26 @@ public class GameController : MonoBehaviour {
 
     public Camera gameCamera = null;
     public TileGrid tileGrid = null;
+    public Player player = null;
 
     // Use this for initialization
     void Start () {
         Assert.IsNotNull(gameCamera, "gameCamera must be set!");
         Assert.IsNotNull(tileGrid, "tileGrid must be set!");
+        Assert.IsNotNull(player, "player must be set!");
+    }
+
+    void MoveToGridPosition(GameObject obj, Vector2Int gridPos, float z)
+    {
+        Vector3 worldPos = tileGrid.gridToWorldPosition(gridPos);
+        worldPos.z = z;
+        obj.transform.position = worldPos;
     }
 
     // Update is called once per frame
     void Update () {
+        MoveToGridPosition(player.gameObject, player.gridPos, -1);
+
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             RaycastHit hit;
@@ -33,15 +44,24 @@ public class GameController : MonoBehaviour {
 
                 if (hitTile)
                 {
-                    if (hitTile.CanBurn())
+                    PlayerActionType playerAction = player.handleTileSelected(hitTile);
+
+                    switch(playerAction)
                     {
+                    case PlayerActionType.None:
+                        break;
+
+                    case PlayerActionType.Move:
+                        player.gridPos = hitTile.gridPos;
+                        break;
+
+                    case PlayerActionType.SpreadFire:
+                        player.gridPos = hitTile.gridPos;
                         hitTile.StartBurn();
+                        break;
                     }
                 }
-
-
             }
-
         }
     }
 }
